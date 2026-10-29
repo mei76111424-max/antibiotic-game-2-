@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>倒數100秒-抗生素生存遊戲</title>
+<style>
+:root{--sky1:#bfe3f2;--sky2:#f6f1d8;--h1:#8fc28a;--h2:#6aa874;--card:#fffdf4;--ink:#3b4a3f;--acc:#e8836a;--ok:#5aa56b;--bad:#d4685a;--line:#d9d2b4;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--sky1:#1f3547;--sky2:#3a3b52;--h1:#3f6b4d;--h2:#2e5240;--card:#26302b;--ink:#eef0e2;--acc:#f09a7f;--ok:#7bc28c;--bad:#e58a7c;--line:#46524a}}
+:root[data-theme="dark"]{--sky1:#1f3547;--sky2:#3a3b52;--h1:#3f6b4d;--h2:#2e5240;--card:#26302b;--ink:#eef0e2;--acc:#f09a7f;--ok:#7bc28c;--bad:#e58a7c;--line:#46524a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:"Noto Serif TC","PingFang TC","Microsoft JhengHei",serif;color:var(--ink);background:linear-gradient(var(--sky1),var(--sky2) 70%);overflow-x:hidden;position:relative}
+.cloud{position:fixed;top:8%;width:120px;height:36px;background:#fff;border-radius:40px;opacity:.7;animation:drift 60s linear infinite;z-index:0}
+.cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+.cloud::before{width:50px;height:50px;top:-24px;left:18px}.cloud::after{width:36px;height:36px;top:-14px;left:60px}
+.cloud.b{top:22%;transform:scale(.7);animation-duration:90s;animation-delay:-30s}
+@keyframes drift{from{left:-160px}to{left:110%}}
+.hill{position:fixed;bottom:0;left:-10%;width:120%;height:26vh;background:var(--h1);border-radius:50% 50% 0 0;z-index:0}
+.hill.b{background:var(--h2);height:16vh;left:-30%;width:90%}
+main{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:18px 16px 40px}
+h1{font-size:1.5rem;text-align:center;margin:6px 0 2px}.sub{text-align:center;opacity:.8;margin:0 0 14px;font-size:.9rem}
+.card{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 6px 0 rgba(0,0,0,.07);margin-bottom:14px}
+label{display:block;font-size:.9rem;margin:10px 0 4px}
+input{width:100%;font:inherit;padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:transparent;color:var(--ink)}
+.btn{font:inherit;cursor:pointer;border:0;border-radius:16px;padding:12px 16px;background:var(--acc);color:#fff;font-weight:700;width:100%;margin-top:12px;box-shadow:0 4px 0 rgba(0,0,0,.15)}
+.btn:active{transform:translateY(2px)}
+.grp{display:flex;gap:8px;flex-direction:column}
+.grp button{font:inherit;text-align:left;padding:12px;border-radius:14px;border:2px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.grp button.on{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 18%,transparent);font-weight:700}
+.hud{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin-bottom:8px}
+.bar{height:12px;border-radius:8px;background:var(--line);overflow:hidden;margin-bottom:12px}.bar i{display:block;height:100%;background:var(--ok);width:100%;transition:width 1s linear}
+.q{font-size:1.15rem;line-height:1.55;margin:4px 0 14px;font-weight:700}
+.lv{font-size:.75rem;opacity:.7}
+.opt{display:block;width:100%;font:inherit;text-align:left;padding:13px;margin-bottom:9px;border-radius:14px;border:2px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.opt.ok{background:var(--ok);color:#fff;border-color:var(--ok)}.opt.bad{background:var(--bad);color:#fff;border-color:var(--bad)}
+table{width:100%;border-collapse:collapse;font-size:.92rem}td,th{padding:7px 4px;border-bottom:1px dashed var(--line);text-align:left}th{opacity:.7;font-weight:600}
+.me{background:color-mix(in srgb,var(--acc) 22%,transparent)}
+.fb{border-top:2px dashed var(--line);padding-top:8px;font-size:.92rem}.fb p{margin:6px 0;line-height:1.55}.fb .btn{margin-top:4px;padding:8px}
+.big{font-size:2.6rem;text-align:center;font-weight:800;color:var(--acc)}.c{text-align:center}.err{color:var(--bad);font-size:.85rem;min-height:1.2em}
+.hero{text-align:center;margin:4px 0 18px;padding:16px 8px;border-radius:24px;background:color-mix(in srgb,var(--card) 70%,transparent);border:2px solid var(--line)}
+.hero-main{font-size:5.3vw;font-weight:900;letter-spacing:0;line-height:1.35;white-space:nowrap;color:#2f5d3f}
+@media (min-width:768px){.hero-main{font-size:1.6rem;letter-spacing:.04em}}
+.hero-sub{margin-top:8px;font-size:clamp(1rem,4vw,1.25rem);letter-spacing:.14em;color:#5f8a62}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .hero-main{color:#cfe8c4}:root:not([data-theme="light"]) .hero-sub{color:#a9cfa4}}
+:root[data-theme="dark"] .hero-main{color:#cfe8c4}:root[data-theme="dark"] .hero-sub{color:#a9cfa4}
+#bgfx{position:fixed;inset:0;z-index:0;background:#FB923C;opacity:0;transition:opacity 1.2s ease,background-color 1.2s ease;pointer-events:none}
+body[data-lv="2"] #bgfx{opacity:1;background:#F97316}
+body[data-lv="3"] #bgfx{opacity:1;background:#DC2626;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.82;background-color:#DC2626}50%{opacity:1;background-color:#EF4444}}
+.hill{transition:opacity 1.2s}body[data-lv="2"] .hill,body[data-lv="3"] .hill{opacity:.3}
+.scw{position:relative;display:inline-block}
+.plus.minus{color:var(--bad)}
+.plus{position:absolute;right:0;top:-10px;color:var(--ok);font-weight:900;font-size:1.4rem;pointer-events:none;white-space:nowrap;animation:fly .9s ease-out forwards}
+@keyframes fly{from{opacity:1;transform:translateY(0) scale(.8)}to{opacity:0;transform:translateY(-34px) scale(1.3)}}
+#t{display:inline-block;transition:font-size .2s}
+#t.hot{color:#DC2626;font-size:1.7rem;animation:shake .35s linear infinite}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translate(-2px,1px) rotate(-3deg)}75%{transform:translate(2px,-1px) rotate(3deg)}}
+@media (prefers-reduced-motion:reduce){#bgfx,.plus,#t.hot{animation:none}}
+.walker{position:fixed;left:0;z-index:0;width:48px;pointer-events:none;animation:walk var(--d) linear infinite alternate;animation-delay:var(--o)}
+.walker.w1{--d:24s;--o:-6s;bottom:2vh}.walker.w2{--d:30s;--o:-19s;bottom:5.5vh}.walker.w3{--d:27s;--o:-12s;bottom:3.5vh}.walker.w4{--d:21s;--o:-30s;bottom:6vh}.walker.w5{--d:34s;--o:-9s;bottom:1.5vh}.walker.w6{--d:26s;--o:-40s;bottom:4vh}
+.flip{animation:flip calc(var(--d)*2) step-end infinite;animation-delay:var(--o)}
+.hop{animation:hop var(--h,.55s) ease-in-out infinite alternate}
+.walker svg{display:block;width:100%;height:auto;overflow:visible}
+@keyframes walk{from{transform:translateX(0)}to{transform:translateX(calc(100vw - 56px))}}
+@keyframes flip{0%{transform:scaleX(1)}50%{transform:scaleX(-1)}}
+@keyframes hop{from{transform:translateY(0) rotate(-2deg)}to{transform:translateY(-6px) rotate(2deg)}}
+.bgc{position:fixed;z-index:0;width:130px;pointer-events:none;opacity:.92;animation:bob 6s ease-in-out infinite alternate}
+.bgc.tl{top:calc(env(safe-area-inset-top,0px) + 6px);left:2%}.bgc.br{right:2%;bottom:9vh;width:110px;animation-delay:-3s}
+@keyframes bob{from{transform:translateY(-8px)}to{transform:translateY(8px)}}
+#combo{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12%);left:50%;transform:translateX(-50%);z-index:5;pointer-events:none;opacity:0;font-weight:900;font-size:1.4rem;white-space:nowrap;padding:8px 18px;border-radius:30px;background:var(--card);color:var(--acc);border:3px solid var(--acc);box-shadow:0 5px 0 rgba(0,0,0,.12)}
+#combo.show{animation:pop 1.2s ease-out}
+@keyframes pop{0%{opacity:0;transform:translateX(-50%) scale(.4)}18%{opacity:1;transform:translateX(-50%) scale(1.18)}70%{opacity:1;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) translateY(-22px) scale(1)}}
+@media (prefers-reduced-motion:reduce){.walker,.flip,.hop,.bgc,#combo.show{animation:none}#combo.show{opacity:1}}
+.mq{overflow:hidden;white-space:nowrap;border-radius:12px;border:2px solid var(--line);background:color-mix(in srgb,var(--acc) 12%,transparent);margin:8px 0;padding:9px 0;font-size:.92rem}.mqt{display:inline-flex;width:max-content;animation:mq 30s linear infinite}.mqt span{padding-right:3em}.mq:hover .mqt{animation-play-state:paused}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.mqt{animation:none}.mq{overflow-x:auto}}
+.boss{border-color:var(--acc)}.bh{font-weight:700;margin:10px 0 2px;color:var(--acc)}.boss td:nth-child(3){line-height:1.4}
+.wrap{overflow-x:auto}.note{font-size:.78rem;opacity:.7;text-align:center}
+</style></head><body>
+<div id="bgfx"></div><div class="cloud"></div><div class="cloud b"></div><div class="hill b"></div><div class="hill"></div>
+<svg class="bgc tl" viewBox="0 0 120 60" aria-hidden="true"><g fill="#fff" stroke="#bcd9e6" stroke-width="3"><circle cx="35" cy="36" r="18"/><circle cx="62" cy="26" r="22"/><circle cx="90" cy="37" r="17"/><rect x="26" y="37" width="74" height="17" rx="8"/></g><g fill="#fff"><circle cx="35" cy="36" r="16"/><circle cx="62" cy="26" r="20"/><circle cx="90" cy="37" r="15"/><rect x="28" y="37" width="70" height="15" rx="7"/></g></svg>
+<svg class="bgc br" viewBox="0 0 120 60" aria-hidden="true"><g fill="#fff" stroke="#bcd9e6" stroke-width="3"><circle cx="35" cy="36" r="18"/><circle cx="62" cy="26" r="22"/><circle cx="90" cy="37" r="17"/><rect x="26" y="37" width="74" height="17" rx="8"/></g><g fill="#fff"><circle cx="35" cy="36" r="16"/><circle cx="62" cy="26" r="20"/><circle cx="90" cy="37" r="15"/><rect x="28" y="37" width="70" height="15" rx="7"/></g></svg>
+<div class="walker w1"><div class="flip"><div class="hop"><svg viewBox="0 0 48 64" aria-hidden="true"><circle cx="24" cy="21" r="11" fill="#6b4a3a"/><path d="M13 58Q14 36 24 34Q36 36 37 58Z" fill="#9fd3e6" stroke="#6aa9c0" stroke-width="1.5"/><path d="M19 58Q20 40 24 38Q29 40 30 58Z" fill="#fff"/><circle cx="25" cy="22" r="9.5" fill="#fde2c8"/><path d="M13 16Q24 1 36 16L34 19H15Z" fill="#fff" stroke="#c9c2a6" stroke-width="1.5"/><path d="M24 7v6M21 10h6" stroke="#e0554f" stroke-width="2.2" stroke-linecap="round"/><circle cx="26" cy="24" r="1.4" fill="#3b2f2a"/><circle cx="32" cy="24" r="1.4" fill="#3b2f2a"/><circle cx="24" cy="27" r="1.8" fill="#f7b2a8"/><circle cx="34" cy="27" r="1.8" fill="#f7b2a8"/><ellipse cx="19" cy="60" rx="4" ry="2.4" fill="#5a4638"/><ellipse cx="31" cy="60" rx="4" ry="2.4" fill="#5a4638"/></svg></div></div></div>
+<div class="walker w2"><div class="flip"><div class="hop"><svg viewBox="0 0 48 64" aria-hidden="true"><rect x="11" y="6" width="26" height="50" rx="13" fill="#fff"/><path d="M11 30V19a13 13 0 0 1 26 0V30Z" fill="#e8685c"/><rect x="11" y="6" width="26" height="50" rx="13" fill="none" stroke="#8a7a68" stroke-width="2"/><path d="M11 30H37" stroke="#8a7a68" stroke-width="1.5"/><circle cx="24" cy="40" r="1.6" fill="#3b2f2a"/><circle cx="31" cy="40" r="1.6" fill="#3b2f2a"/><path d="M25 45q3 3 6 0" fill="none" stroke="#3b2f2a" stroke-width="1.5" stroke-linecap="round"/><circle cx="21" cy="44" r="2" fill="#f7b2a8"/><circle cx="34" cy="44" r="2" fill="#f7b2a8"/><path d="M16 14q3-4 5-2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/><ellipse cx="19" cy="59" rx="4" ry="2.4" fill="#8a5a44"/><ellipse cx="30" cy="59" rx="4" ry="2.4" fill="#8a5a44"/></svg></div></div></div>
+<div class="walker w3"><div class="flip"><div class="hop"><svg viewBox="0 0 48 64" aria-hidden="true"><path d="M24 32Q10 28 8 14Q20 14 24 30Z" fill="#6fbf73"/><path d="M24 32Q38 28 40 14Q28 14 24 30Z" fill="#8fd18a"/><path d="M24 32Q21 18 26 7Q33 17 24 32Z" fill="#5aa56b"/><rect x="10" y="33" width="28" height="7" rx="3" fill="#f0b48e" stroke="#b97650" stroke-width="1.5"/><path d="M12 40H36L33 58H15Z" fill="#e8a27a" stroke="#b97650" stroke-width="1.5"/><path d="M16 46v4M14 48h4" stroke="#e0554f" stroke-width="1.8" stroke-linecap="round"/><circle cx="25" cy="48" r="1.5" fill="#3b2f2a"/><circle cx="31" cy="48" r="1.5" fill="#3b2f2a"/><path d="M26 52q3 2.5 6 0" fill="none" stroke="#3b2f2a" stroke-width="1.4" stroke-linecap="round"/><ellipse cx="19" cy="60" rx="4" ry="2.4" fill="#b97650"/><ellipse cx="30" cy="60" rx="4" ry="2.4" fill="#b97650"/></svg></div></div></div>
+<div class="walker w4"><div class="flip"><div class="hop"><svg viewBox="0 0 48 64" aria-hidden="true"><circle cx="24" cy="21" r="11" fill="#d9a441"/><path d="M13 58Q14 36 24 34Q36 36 37 58Z" fill="#f6b8c4" stroke="#d98fa0" stroke-width="1.5"/><path d="M19 58Q20 40 24 38Q29 40 30 58Z" fill="#fff"/><circle cx="25" cy="22" r="9.5" fill="#fde2c8"/><path d="M13 16Q24 1 36 16L34 19H15Z" fill="#fff" stroke="#c9c2a6" stroke-width="1.5"/><path d="M24 7v6M21 10h6" stroke="#e0554f" stroke-width="2.2" stroke-linecap="round"/><circle cx="26" cy="24" r="1.4" fill="#3b2f2a"/><circle cx="32" cy="24" r="1.4" fill="#3b2f2a"/><circle cx="24" cy="27" r="1.8" fill="#f7b2a8"/><circle cx="34" cy="27" r="1.8" fill="#f7b2a8"/><ellipse cx="19" cy="60" rx="4" ry="2.4" fill="#5a4638"/><ellipse cx="31" cy="60" rx="4" ry="2.4" fill="#5a4638"/></svg></div></div></div>
+<div class="walker w5"><div class="flip"><div class="hop"><svg viewBox="0 0 48 64" aria-hidden="true"><rect x="11" y="6" width="26" height="50" rx="13" fill="#fff"/><path d="M11 30V19a13 13 0 0 1 26 0V30Z" fill="#f0786a"/><rect x="11" y="6" width="26" height="50" rx="13" fill="none" stroke="#8a7a68" stroke-width="2"/><path d="M11 30H37" stroke="#8a7a68" stroke-width="1.5"/><circle cx="24" cy="40" r="1.6" fill="#3b2f2a"/><circle cx="31" cy="40" r="1.6" fill="#3b2f2a"/><path d="M25 45q3 3 6 0" fill="none" stroke="#3b2f2a" stroke-width="1.5" stroke-linecap="round"/><circle cx="21" cy="44" r="2" fill="#f7b2a8"/><circle cx="34" cy="44" r="2" fill="#f7b2a8"/><path d="M16 14q3-4 5-2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/><ellipse cx="19" cy="59" rx="4" ry="2.4" fill="#8a5a44"/><ellipse cx="30" cy="59" rx="4" ry="2.4" fill="#8a5a44"/><path d="M24 6Q24 0 30 -1Q31 5 24 6Z" fill="#6fbf73"/></svg></div></div></div>
+<div class="walker w6"><div class="flip"><div class="hop"><svg viewBox="0 0 48 64" aria-hidden="true"><path d="M13 58Q14 38 24 36Q36 38 37 58Z" fill="#7fb6a0" stroke="#5c9784" stroke-width="1.5"/><path d="M24 41v7M20.5 44.5h7" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="24" cy="25" r="10" fill="#fde2c8"/><path d="M15 26Q24 22 34 26L32 33Q24 37 17 33Z" fill="#fff" stroke="#9fd3e6" stroke-width="1.5"/><path d="M14 20Q14 6 24 6Q35 6 35 20Z" fill="#7fb6a0" stroke="#5c9784" stroke-width="1.5"/><path d="M14 18H35" stroke="#fff" stroke-width="2.2"/><circle cx="26" cy="22" r="1.4" fill="#3b2f2a"/><circle cx="32" cy="22" r="1.4" fill="#3b2f2a"/><ellipse cx="19" cy="60" rx="4" ry="2.4" fill="#5a4638"/><ellipse cx="31" cy="60" rx="4" ry="2.4" fill="#5a4638"/></svg></div></div></div>
+<div id="combo"></div>
+<main>
+<h1>🍃 倒數100秒-抗生素生存遊戲</h1>
+
+<section id="s-start">
+ <div class="hero"><div class="hero-main">抗生素聰明用，防疫一體齊行動</div><div class="hero-sub">正確使用抗生素，攜手守護健康路</div></div>
+ <div class="card">
+  <label>① 請選擇身分</label>
+  <div class="grp">
+   <button data-g="1">醫師・藥師・醫檢師・護理師（含專科護理師）</button>
+   <button data-g="2">醫院工作人員（非上述職稱）</button>
+  </div>
+  <label for="eid">② 員工編號（5 碼數字）</label>
+  <input id="eid" inputmode="numeric" maxlength="5" placeholder="例：01234">
+  <label for="unit">③ 單位</label>
+  <input id="unit" maxlength="20" placeholder="例：5B 病房">
+  <div class="err" id="err"></div>
+  <button class="btn" id="go">開始挑戰 ▶</button>
+ </div>
+ <div class="card"><b>🏆 排行榜</b><div class="wrap" id="lb0"></div><button class="btn" id="csv" hidden>匯出全部答題紀錄（CSV）</button></div>
+ <div class="card boss"><b>📢 院內宣導重點：答錯率最高前 3 名題目</b><div class="wrap" id="bd0"></div></div>
+</section>
+
+<section id="s-play" hidden>
+ <div class="card">
+  <div class="hud"><span>⏱ <span id="t">100</span> 秒</span><span class="scw" id="scw">✅ <span id="sc">0</span> 分</span></div>
+  <div class="bar"><i id="bar"></i></div>
+  <div class="lv" id="lv"></div><div class="q" id="q"></div><div id="opts"></div>
+  <div class="fb" id="fb" hidden><b id="fbh"></b><p id="fbt"></p><button class="btn" id="nx">下一題 ▶</button></div>
+ </div>
+</section>
+
+<section id="s-end" hidden>
+ <div class="card"><div class="c">時間到！</div><div class="big" id="fs">0</div>
+  <div class="c" id="fd"></div><div class="note" id="sv"></div>
+  <button class="btn" id="again">再玩一次</button></div>
+ <div class="card"><b>🏆 積分排行榜</b><div class="wrap" id="lb1"></div></div>
+ <div class="card boss"><b>📢 院內宣導重點：答錯率最高前 3 名題目</b><div class="wrap" id="bd1"></div></div>
+</section>
+</main>
+<script>
+const T=(q,ok,e)=>[q,["⭕ 正確","❌ 錯誤"],ok?0:1,e,1];
+const C=(q,a,b,ans,e)=>[q,[a,b],ans==="A"?0:1,e,0];
+// ===== 題庫 =====
+const BANK={1:[
+T("懷疑病人發生嚴重敗血症（Sepsis）時，為了爭取時間，應立刻打第一劑抗生素，完全不用等血液培養抽血？",0,"扣血！正確順序是「快速採血培養 ➡️ 即刻給予廣效抗生素」，但切記抽血絕不能耽誤抗生素超過 1 小時！"),
+T("重症感染患者的抗生素劑量調整，只需要看肝腎功能，跟藥物是親水性還是親脂性完全沒關係？",0,"大踩雷！親水性藥物易隨水腫、腹水稀釋，重症早期通常需要給予更高的「起始負荷劑量（Loading dose）」！"),
+T("輸注 Vancomycin（萬古黴素）時，為了趕進度，可以隨意把點滴速度調到最快，只要總量對了就行？",0,"大危機！Vancomycin 滴太快會引發組織胺釋放的「紅人症候群（Red man syndrome）」，必須嚴格慢速滴注！"),
+T("照顧確認感染多重抗藥性鮑氏不動桿菌（CRAB）的患者，護理師進入隔離病房只需穿戴手套，不需要換隔離衣？",0,"防護全面破防！CRAB 環境存活能力極強，進去必須「手套 + 口罩 + 防護隔離衣」全套穿好！"),
+T("執行抗生素治療藥物監測（TDM）時，測定 Vancomycin 的谷濃度（Trough level），最佳採血時機是「下一次給藥前的 30 分鐘內」？",1,"漂亮！這時機點能精準確保藥物持續有效，同時避免蓄積腎毒性！"),
+T("口服 Levofloxacin 等 Fluoroquinolones 類抗生素，可以跟牛奶或含有鈣、鎂、鐵的胃藥同時服用，完全不影響吸收？",0,"治療失敗！它們會產生「螯合作用」讓腸道無法吸收，血藥濃度直接暴跌！必須至少間隔 2 小時！"),
+T("外科手術預防性抗生素（PAP）的最佳給藥時機，是在手術切口（Skin incision）前的 60 分鐘內給予？",1,"得分！目標是切開皮膚時血液藥物濃度達到尖峰。但注意：若用 Vancomycin 則因滴注時間長，需在 120 分鐘內給予！"),
+T("治療耐甲氧西林金黃色葡萄球菌（MRSA）引起的「嚴重肺炎」時，Daptomycin 是首選且療效極佳的殺菌性抗生素？",0,"天啊答錯超致命！Daptomycin 會被肺部的「表面張力素」不活化，絕對不能拿來治肺炎！"),
+T("病患培養確認為抗萬古黴素腸球菌（VRE）陽性，若沒有單人房，絕對不可以和一般手術後無感染的病人混住？",1,"觀念正確！VRE 傳播力極強，無單人房必須採取「同類集中隔離（Cohorting）」，混住會引發院內群聚大爆發！"),
+T("Aminoglycosides 類抗生素（如 Amikacin）屬於濃度依賴型藥物，臨床常採用「每日一次高劑量（OD）」給藥，這樣做殺菌效果更好且能降低腎毒性？",1,"太強了！這能利用其強大的「抗生素後效應（PAE）」，並給腎小管細胞時間排空藥物，降低蓄積毒性！"),
+T("重症患者長期使用廣效抗生素後如果出現持續腹瀉、發燒，應高度警覺是否發生了「艱難梭菌感染（CDI）」？",1,"賓果！廣效抗生素會摧毀腸道正常菌叢，引發偽膜性結腸炎。確診要考慮停原藥，改用口服 Vancomycin 治療！"),
+T("只要臨床醫師個人經驗豐富，開立後線最後防線抗生素（如 Colistin）時，就不需要經過感染科醫師審查？",0,"鋼鐵防線不容動搖！為了延緩終極藥物失效，必須落實事前或限時 48 小時的事後實質審查！"),
+C("微生物室收到一管痰液檢體，鏡檢發現上皮細胞 > 25 顆！這時安檢官應該怎麼做？","抓到冒牌貨！這根本是一口老口水，立刻建議重新送檢！","有送有保庇，相信它來自肺部，直接做抗藥性鑑定！","A","選 A 才是神安檢！上皮細胞多代表整管都是口水污染，強行做培養只會抓錯犯人，嚴重誤導醫師開錯抗生素！"),
+C("痰液培養報告出爐，看到了「凝固酶陰性葡萄球菌（CoNS）」陽性，這時該發動抗生素攻擊嗎？","發動攻擊！只要報告是陽性，就代表這隻細菌在作怪！","且慢！這高機率只是路過的「定植房客」，根本沒有動手拆房子！","B","選 B！CoNS 或念珠菌在痰液裡通常只是「定植菌（Colonization）」或污染菌。病人若沒症狀，不需常規開抗生素濫殺無辜！"),
+C("住院病患的痰液真菌培養分離出「念珠菌（Candida）」，但 X 光或臨床症狀完全沒有真菌感染跡象，處置為何？","冷靜判斷！這只是口咽部的 Colonization，不需要給抗真菌藥！","大事不妙！立刻靜脈注射 Fluconazole 進行大殺滅！","A","選 A 救回一命！盲目開抗真菌藥只會增加病人身體負擔。它只是純借宿的定植菌，別呼叫鎮暴警察！"),
+C("血液培養中突然抓到高度多重抗藥性的「碳青黴烯類抗藥性腸桿菌（CRE）」，這時該怎麼做？","微生物室啟動通報！病房立刻隔離，拉響全院感控聯防！","先做小筆記，等明天醫師查房再順便提醒。","A","選 A！CRE 是院內感控一級通緝犯，一經檢出就是臨床危急值，必須秒速通報、秒速實施接觸隔離！"),
+C("臨床推行「抗生素降階治療（De-escalation）」，真正的含意是？","直接停用所有抗生素，幫病患和醫院節省健保開銷。","重症先用廣效藥蓋台，培養確認菌種後立刻換成窄效藥精準打擊！","B","選 B！精準打擊才是合理用藥（Stewardship）的核心，既能有效殺菌，又能減少抗藥性細菌被篩選出來的壓力！"),
+C("在病房調配完抗生素後，剩下未滴注完的殘餘藥液，可以直接倒進洗手檯沖走嗎？","絕對不行！這樣會污染水源，等於在院外開抗藥性特訓班！","可以啊，水龍頭水很大，稀釋掉就神不知鬼不覺了。","A","選 A！廢棄抗生素溶液屬於化學有害醫療廢棄物，直接沖走會讓環境細菌進化成變種超級細菌！必須倒入專用廢液桶！"),
+C("藥敏試驗發現金黃色葡萄球菌對紅黴素（Erythromycin）抗藥、對克林黴素（Clindamycin）敏感，微生物室該怎麼做？","不能信！必須加做 D-test 逼這隻愛演戲的細菌現出抗藥原形！","報告寫啥就信啥！直接發出敏感報告，省時又省力！","A","選 A 的才是專家！紅黴素會激發細菌的隱藏抗藥基因（誘導型抗藥）。不做 D-test，臨床一用克林黴素就會失效！"),
+C("若發現綠膿桿菌對 Piperacillin、Ceftazidime、Imipenem、Ciprofloxacin 等三大類以上核心抗生素通通抗藥，它已經進化了嗎？","對！它已練成金鐘罩，正式升級為多重抗藥性綠膿桿菌（MDR-PA）！","沒事，它只是今天心情不好，改天再測防禦力就降下來了。","A","選 A！這已是院內感控一級通緝犯，立刻啟動院內多重抗藥性（MDRO）鋼鐵防線！"),
+C("查房時發現，長照機構的張阿公留置尿管，人好端端看電視、沒發燒也沒不舒服，但尿液培養長出細菌！你的處置原則為何？","立刻開立 7-10 天廣效抗生素，把細菌祖宗十八代都超渡了！","不建議給抗生素，避免副作用大爆發還養出超級細菌。","B","選 B！國際指南明確指出：對「無症狀菌尿症（ASB）」給藥，只是在幫細菌辦抗藥性魔鬼訓練營！"),
+C("「無症狀就不用藥」是鐵律，但哪一類族群即使沒症狀，也必須主動篩檢、抓到細菌就治療？","已經跟導尿管當了一年靈魂伴侶的住院老病患。","懷孕的孕媽咪，以及即將接受泌尿科手術（會切到黏膜出血）的患者。","B","答案是 B！治療孕婦的 ASB 可降低急性腎盂腎炎與早產、流產的發生率！"),
+C("深夜三點，intern 驚慌地說：「學長！導尿管病人的尿檢滿滿白血球（膿尿 Pyuria 陽性）！要不要立刻開抗生素？」","call！白血球都出來打架了，抗生素還不給它一劑重拳？！","睡你的覺！導尿管放久了尿裡有白血球很常見，別衝動！","B","冷靜！導尿管病患出現膿尿在醫院很常見，沒發燒、沒局部症狀就開藥，只會養出更瘋狂的細菌！"),
+C("採集清潔「中段尿」送培養，傳統上細菌要到多少菌落數，才算確診膀胱菌尿症（Bladder bacteriuria）？","≥ 10^3 CFU/mL（破千就開槍！）","≥ 10^5 CFU/mL（突破十萬大關！）","B","密碼是 10^5！菌落數稀稀落落又沒症狀，通常只是尿道或皮膚表面的污染菌。"),
+C("留置導尿管的病患開始發燒、腰痛，CVA tenderness 陽性，尿培養細菌數 ≥ 10^3 CFU/mL。該怎麼診斷？","導管相關「無症狀」菌尿症（CA-ASB）— 他在裝痛。","導管相關「症狀性」尿路感染（CA-UTI）— 警報真的響了！","B","選 B！有發燒、有局部痛、細菌數也達標，是正宗的 CA-UTI，抗生素部隊立刻出動！"),
+C("血液培養裡發現細菌。下列哪一種被分離出來，通常「不用懷疑是採血污染，百分之百是真兇」？","金黃色葡萄球菌（Staphylococcus aureus）— 遇見它就是一場硬仗。","痤瘡丙酸桿菌（Cutibacterium acnes）— 皮膚上的邊緣人。","A","選 A！金黃色葡萄球菌出現在血中是頂級警報，鮮少是污染。B 通常只是採血時被針頭帶進去的皮膚菌。"),
+C("使用「半定量滾板法（Maki roll-plate）」檢測靜脈導管尖端，菌落數超過多少，才判定為「導管菌落化」？","> 5 CFU（五福臨門）","> 15 CFU（十五月亮圓又圓）","B","密碼是 > 15 CFU！導管尖端在培養平板上滾動，超過 15 CFU 才是判定導管菌落化的標準。"),
+C("要判定「導管相關血流感染（CRBSI）」，只要導管尖端培養 > 15 CFU 就能定罪，完全不用多抽周邊血比對？","沒錯，鐵證如山，導管上都是菌！","錯誤！必須導管尖端有菌，同時周邊血也抓到同一種菌，兩者連線才算數！","B","防線缺一不可！CRBSI 需「導管尖端 > 15 CFU」加上「周邊血培養同一菌株（Taxon Match）」才能確診。"),
+C("拔掉中心靜脈導管後，尖端培養出金黃色葡萄球菌。周邊血陰性、病人沒發燒，可以不給抗生素嗎？","正確，血培養陰性，放生他吧。","錯誤！這隻菌太凶殘，即便周邊血暫時陰性，仍要給抗生素預防日後反撲！","B","金黃色葡萄球菌會「躲貓貓」，可能幾天後引發血流感染或心內膜炎，仍建議給予短天數抗生素。"),
+C("防疫一體（One Health）：阿伯說「把人類在吃的核心抗生素磨粉加進飼料當日常保養品餵豬、餵貓，最安心！」阿伯對嗎？","正確，提早預防，養出無菌神豬！","錯誤！絕對禁止！這是導致全球環境抗藥性崩盤的元兇！","B","動物用藥必須由獸醫精準處方，並與人類核心抗生素嚴格區隔。把救命藥當飼料保養，只會養出無藥可醫的超級細菌！")
+],2:[
+T("感冒引起喉嚨痛、流鼻水，就該主動要求醫師開抗生素，感冒才會好得快？",0,"扣血！感冒九成是「病毒」引起的，抗生素只殺「細菌」，吃了不但沒效，還會破壞腸道益生菌！"),
+T("吃抗生素幾天後發燒退了、症狀改善，為了不傷身體可以自己提早停藥？",0,"大踩雷！症狀好不代表細菌死光，擅自停藥只會把殘存細菌鍛鍊成「超級細菌」！"),
+T("這次生病的症狀跟上次一模一樣，可以直接去藥局買上次吃剩的抗生素來吃？",0,"母湯喔！每次生病的病原體都不同，抗生素是醫師處方用藥，不能憑經驗自己買！"),
+T("如果家人朋友出現跟我一模一樣的感染症狀，我可以大方分享自己沒吃完的抗生素給他？",0,"危險！每種抗生素抗菌範圍都不同，分享藥物還可能引發嚴重過敏！"),
+T("看診時要落實「診間三問」：問藥名功效、問服用多久、問注意事項，這觀念對嗎？",1,"完全正確！主動問、聰明用，這三問就是你最強的用藥護身符！"),
+T("政府宣導的抗生素「三不原則」指的是：不自行購買、不主動要求、不隨便停藥？",1,"沒錯！「三不」再加上「一要」（要準時服藥至療程結束），抗藥性才不會失控！"),
+T("家裡養的毛孩如果生病，為了省麻煩，可以直接把人吃剩的抗生素拌在飼料裡給牠們吃？",0,"絕對不可以！人類與動物的藥物劑量完全不同，隨便餵食會讓寵物中毒，還會養出魔王細菌！"),
+T("家中如果有過期或沒吃完的抗生素藥品，最正確的處理方式是丟入廚餘桶或直接沖入馬桶？",0,"大錯特錯！這樣會污染水源，讓大自然變成細菌的「抗藥性特訓班」！請拿去醫院或藥局的「廢棄藥品回收站」！"),
+T("所謂的「抗藥性」，是指「人類的身體對藥物產生免疫、變習慣了」，所以藥才沒效？",0,"超常見迷思！變強的是「細菌本身」學會了金鐘罩，就算平時不吃抗生素的人也可能被超級細菌感染！"),
+T("為了料理方便，生肉可以直接在切完熟食的砧板上切塊，順便增添風味？",0,"太驚悚了！生肉上的抗藥性細菌會交叉污染熟食，生熟食砧板刀具一定要嚴格分開！"),
+T("當醫師評估後確定開立抗生素，最正確的用藥態度是：嚴格按照藥袋標示的時間與劑量，將整份療程完整吃完？",1,"漂亮！斬草除根就是要按時、按量、吃完整個療程，一隻細菌都不放過！"),
+T("為了防範多重抗藥性菌株在醫院內傳播，醫護人員應嚴格落實 WHO 宣導的「洗手五時機」？",1,"得分！手部衛生是阻斷院內魔王菌交叉感染最經濟、最有效的方法！"),
+T("接觸配戴傳播高風險多重抗藥性菌株（MDRO）病人的周邊醫療儀器（如點滴架、螢幕）後，雖然「沒有碰到病人身體」，也必須立即執行手部衛生？",1,"觀念太讚了！細菌在儀器表面可以活好幾週，碰了不洗手，照樣會把魔王菌傳給下一個病患！"),
+T("醫院病房清潔多重抗藥性鮑氏不動桿菌（CRAB）病患床周邊時，直接使用一般抹布和清水擦拭即可？",0,"不行！這隻細菌生命力超頑強，清潔必須依感控指引，使用指定濃度的稀釋漂白水，且抹布必須分區！"),
+T("醫療照護時，疾管署推廣「手套護一時，洗手保一世」，所以只要戴上手套，一整天都不需要洗手？",0,"錯！戴手套絕對無法替代洗手，脫手套後依然要落實手部衛生！"),
+T("醫院行政人員不負責臨床看診，所以抗藥性防治與大眾宣導工作與行政同仁毫無關係？",0,"太小看自己了！政策推動、衛教活動企劃、統計感控指標，行政同仁是不可或缺的幕後大推手！"),
+T("在醫院評鑑條文中，多重抗藥性菌株（MDRO）的管理僅屬於感管專科的責任，非臨床的行政單位不需要納入評鑑考核？",0,"全院聯防，誰都不能漏！總務環境清潔、資材物料調配通通都要共同接受查核！"),
+T("IT 或電子病歷工程師在醫令系統設計「抗生素事前審查強制阻斷或提示系統」，對減少抗生素濫用毫無顯著幫助？",0,"大有幫助！自動卡關與到期提醒是合理用藥管理最堅固的「數位防線」！"),
+T("公關企劃或社區衛教同仁在籌辦活動時，加強宣導抗生素「三不原則」，能從源頭減少病患到診間施壓醫師開藥的機率？",1,"完全正確！你們就是阻斷社區抗藥性的最前線戰士！"),
+T("健保申報同仁若發現病歷中未附培養報告卻長期申報限制性抗生素，適時提醒臨床團隊，能發揮用藥把關的作用？",1,"沒錯！你們是神聖的「守門人」，不僅幫醫院防止被扣款，更督促臨床落實科學用藥！"),
+T("藥品採購同仁評估抗生素品項進藥時，只需考量價格越便宜越好，不需要評估藥廠供藥穩定度與藥品療效？",0,"大錯特錯！只看低價導致斷藥或療效不佳，臨床被迫改用後線廣效抗生素，反而會篩選出更多抗藥性細菌！"),
+T("醫院污水處理人員應定期檢測、維護院內廢水處理系統，防止殘留的高濃度抗生素及抗藥性基因直接排入社區環境？",1,"答對了！這就是 One Health 的行政實踐！廢水沒處理好，會在院外養出更強的變種超級細菌！"),
+T("WHO 推動的 One Health（健康一體）理念，強調對抗抗藥性不僅是人類醫學的事，也必須同時規範畜牧、農業與環境？",1,"賓果！細菌會在動物、食物、環境與人類間循環，必須推動跨界聯防！"),
+T("如果人類再不節制使用抗生素，未來可能連拔牙或小擦傷感染，都會面臨無藥可醫的窘境？",1,"絕非危言聳聽！世衛已將其列為全球十大公衛威脅，不行動，未來連化療、手術都將失去保護屏障！"),
+T("世界衛生組織（WHO）將每年的「11 月 18 日至 11 月 24 日」定為世界抗生素週（WAAW）？",1,"答對了！呼籲全球跨領域一起重視抗藥性（AMR）危機！"),
+T("WHO 針對 2026 年世界抗生素週提出的最新口號是：「同一健康，同一行動，立即預防抗生素抗藥性」（One Health, one action: Prevent AMR now）？",1,"時事題過關！強調跨界的「同一行動（one action）」，立刻遏止抗藥性！"),
+T("「教育、提倡、立即行動」（Educate. Advocate. Act now）是 WHO 2026 年的抗生素週主題？",0,"陷阱題！那是 2024 年的舊口號，2026 年最新版本已升級成「同一健康，同一行動（One Health, one action）」！"),
+T("臺灣疾病管制署（CDC）響應 2026 年世界抗生素週的宣導主題是：「抗生素聰明用，防疫一體齊行動」？",1,"完全正確！跟著台灣 CDC 的腳步走，聰明用藥、全體齊心行動！"),
+T("臺灣疾病管制署（CDC）2026 年的口號是「四不一要，Here we go！」？",0,"被騙了吧！「四不一要，Here we go！」是 2024 年的口號，2026 年已是「抗生素聰明用，防疫一體齊行動」！"),
+T("臺灣疾病管制署（CDC）在 2026 年依然沿用「抗藥OUT！四不一要Act Now！」作為宣導主題？",0,"可惜答錯！那是 2025 年的主題。2026 的最新密碼是：「抗生素聰明用，防疫一體齊行動」！")
+]};
+const $=id=>document.getElementById(id);
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const rng=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i-1); // 題號 a..b -> 索引
+let grp=0,eid="",unit="",score=0,correct=0,streak=0,asked=0,curId=0,responsesRecord=[],allRows=[],dl=null,adm=false,left=100,timer=null,queue=[],loopRange=[],cur=null,locked=false,db=null,local=[];
+try{local=JSON.parse(localStorage.getItem("hq_scores")||"[]")}catch(e){}
+
+document.querySelectorAll(".grp button").forEach(b=>b.onclick=()=>{grp=+b.dataset.g;document.querySelectorAll(".grp button").forEach(x=>x.classList.toggle("on",x===b))});
+function show(id){["s-start","s-play","s-end"].forEach(s=>$(s).hidden=s!==id)}
+
+function build(){ // 依身分組別建立出題順序
+  if(grp===1){queue=[...shuf(rng(1,12)),...shuf(rng(13,20))];loopRange=rng(21,30)}
+  else{queue=[...shuf(rng(1,11)),...shuf(rng(12,22))];loopRange=rng(23,30)}
+}
+function setLevel(n){document.body.dataset.lv=n}
+function combo(n){const e=$("combo");e.textContent=(n%2?"🧑‍⚕️👍 ":"🧚✨ ")+n+" 連擊！";e.classList.remove("show");void e.offsetWidth;e.classList.add("show")}
+function plusOne(t,c){const e=document.createElement("span");e.className="plus "+c;e.textContent=t;$("scw").appendChild(e);setTimeout(()=>e.remove(),950)}
+let ft=null;
+function nextQ(){
+  clearTimeout(ft);$("fb").hidden=true;
+  if(!queue.length)queue=shuf(loopRange);
+  const i=queue.shift();cur=BANK[grp][i];curId=i+1;const [q,o]=cur;
+  const lvl=grp===1?(i<12?1:i<20?2:3):(i<11?1:i<22?2:3);setLevel(lvl);
+  $("lv").textContent="Lv."+lvl+"・第 "+(asked+1)+" 題";$("q").textContent=q;
+  const box=$("opts");box.innerHTML="";locked=false;
+  const items=o.map((t,k)=>({t,k}));
+  (cur[4]?items:shuf(items)).forEach(x=>{const b=document.createElement("button");b.className="opt";b.textContent=x.t;b.onclick=()=>pick(b,x.k===cur[2]);box.appendChild(b)});
+}
+function pick(btn,ok){
+  if(locked||left<=0)return;locked=true;asked++;bumpErr(grp,curId,ok);responsesRecord.push({q:curId,grp,ok});
+  btn.classList.add(ok?"ok":"bad");if(ok){score+=1000;correct++;streak++;plusOne("+1000","");if(streak>=3)combo(streak)}else{streak=0;score=Math.max(0,score-200);plusOne("-200","minus")}$("sc").textContent=score;
+  $("fbh").textContent=ok?"✅ 答對了！":"❌ 答錯了，正確答案：「"+cur[1][cur[2]].replace(/^(⭕|❌) /,"$1")+"」";
+  $("fbt").textContent=cur[3];$("fb").hidden=false;
+  ft=setTimeout(()=>{if(left>0)nextQ()},ok?1800:3200);
+}
+$("go").onclick=()=>{
+  eid=$("eid").value.trim();unit=$("unit").value.trim();
+  if(!grp)return $("err").textContent="請先選擇身分";
+  if(!/^\d{5}$/.test(eid))return $("err").textContent="員工編號須為 5 碼數字";
+  if(!unit)return $("err").textContent="請輸入單位";
+  $("err").textContent="";score=0;correct=0;streak=0;asked=0;responsesRecord=[];left=100;$("sc").textContent=0;$("t").textContent=100;$("t").classList.remove("hot");setLevel(1);$("bar").style.width="100%";
+  build();show("s-play");nextQ();
+  timer=setInterval(()=>{left--;$("t").textContent=left;$("t").classList.toggle("hot",left<=10);$("bar").style.width=left+"%";if(left<=0){clearInterval(timer);end()}},1000);
+};
+async function end(){
+  locked=true;clearTimeout(ft);setLevel(0);$("t").classList.remove("hot");show("s-end");$("fs").textContent=score+" 分";
+  $("fd").textContent="答對 "+correct+" 題／作答 "+asked+" 題，答對率 "+(asked?Math.round(correct/asked*100):0)+"%";
+  const detail=responsesRecord.map(r=>r.q+":"+(r.ok?"O":"X")).join(", ");const rec={eid,unit,grp,role:grp===1?"醫師・藥師・醫檢師・護理師":"醫院工作人員",score,correct,asked,ts:Date.now(),detail,answers:responsesRecord.map(r=>({q:r.q,grp:r.grp,ok:r.ok}))};
+  local.push(rec);try{localStorage.setItem("hq_scores",JSON.stringify(local.slice(-500)))}catch(e){}
+  let saved=false;
+  if(db){try{await db.collection("scores").doc(eid+"_"+rec.ts).set(rec);saved=true}catch(e){}}
+  $("sv").textContent=saved?"成績已上傳至共同排行榜":"目前無法上傳，成績僅顯示於本機排行榜";
+  await refresh();
+}
+$("nx").onclick=()=>{if(left>0)nextQ()};
+$("again").onclick=()=>{show("s-start");refresh()};
+
+function norm(r){if(r.correct!=null)return r;const w=Math.max(0,r.asked-r.score);return{...r,correct:r.score,score:Math.max(0,r.score*1000-w*200)}}
+function render(rows){ // 每位員工取最高分，依分數、答對率排序
+  allRows=rows;const acc=r=>r.asked?r.correct/r.asked:0;const best={};rows.map(norm).forEach(r=>{const o=best[r.eid];if(!o||r.score>o.score||(r.score===o.score&&acc(r)>acc(o)))best[r.eid]=r});
+  const list=Object.values(best).sort((a,b)=>(b.score-a.score)||(acc(b)-acc(a))).slice(0,15);
+  const h=list.length?"<table><tr><th>#</th><th>編號</th><th>單位</th><th>積分</th></tr>"+list.map((r,i)=>"<tr class='"+(r.eid===eid?"me":"")+"'><td>"+(i+1)+"</td><td>"+r.eid.replace(/\D/g,"")+"</td><td></td><td>"+r.score+"</td></tr>").join("")+"</table>":"<p class='note'>尚無成績，成為第一位挑戰者吧！</p>";
+  [$("lb0"),$("lb1")].forEach(el=>{el.innerHTML=h;el.querySelectorAll("tr").forEach((tr,i)=>{if(i&&list[i-1])tr.children[2].textContent=list[i-1].unit})});
+}
+async function refresh(){renderBoss();
+  let rows=local;
+  if(db){try{const s=await db.collection("scores").orderBy("score","desc").limit(300).get();rows=s.docs.map(d=>d.data())}catch(e){}}
+  render(rows);
+}
+function bumpErr(g,q,ok){try{const s=JSON.parse(localStorage.getItem("questionErrorStats")||"{}");const k=g+":"+q;const o=s[k]||{w:0,t:0};o.t++;if(!ok)o.w++;s[k]=o;localStorage.setItem("questionErrorStats",JSON.stringify(s))}catch(e){}}
+async function getAllRows(){ // 合併本機 LocalStorage 與共同資料庫紀錄（以 員工編號+時間 去重）
+  const m={};local.forEach(r=>m[r.eid+"_"+r.ts]=r);
+  if(db){try{const s=await db.collection("scores").get();s.docs.forEach(d=>{const r=d.data();m[r.eid+"_"+r.ts]=r})}catch(e){}}
+  return Object.values(m);
+}
+function bossMarquee(st,g,label){
+  const list=Object.entries(st).filter(([k,o])=>k.split(":")[0]==g&&o.w>0&&BANK[g][k.split(":")[1]-1]).sort((a,b)=>b[1].w-a[1].w||(b[1].w/b[1].t-a[1].w/a[1].t)).slice(0,3);
+  const txt=list.length?"【"+label+"錯題 Top 3】"+list.map(([k,o],i)=>{const q=k.split(":")[1];return "第 "+(i+1)+" 名: 第 "+q+" 題("+BANK[g][q-1][0]+")"}).join(" ｜ ")+" ｜ ":"【"+label+"錯題 Top 3】目前數據統計中，請填寫資料開始挑戰！...";
+  const sp="<span>"+txt+"</span>";
+  return "<div class='mq'><div class='mqt' style='animation-duration:"+Math.max(18,Math.round(txt.length*0.27))+"s'>"+sp+sp+"</div></div>";
+}
+async function renderBoss(){
+  const rows=await getAllRows();const st={};let used=false;
+  rows.forEach(r=>{if(Array.isArray(r.answers)&&r.answers.length){used=true;r.answers.forEach(x=>{const k=x.grp+":"+x.q;const o=st[k]||(st[k]={w:0,t:0});o.t++;if(!x.ok)o.w++})}});
+  let S=st;if(!used){try{S=JSON.parse(localStorage.getItem("questionErrorStats")||"{}")}catch(e){S={}}}
+  const h=bossMarquee(S,1,"醫事人員")+bossMarquee(S,2,"行政後勤");
+  $("bd0").innerHTML=h;$("bd1").innerHTML=h;
+}
+async function exportCsv(){
+  const rows=await getAllRows();
+  const H=["員工編號","單位","身分類別","總積分","答對題數","作答題數","答對率","結束時間","詳細答題歷程"];
+  const esc=v=>'"'+String(v==null?"":v).replace(/"/g,'""')+'"';
+  const L=rows.map(norm).sort((a,b)=>(a.ts||0)-(b.ts||0)).map(r=>[r.eid,r.unit,r.grp===1?"醫事人員":"醫院工作人員",r.score,r.correct,r.asked,(r.asked?Math.round(r.correct/r.asked*100):0)+"%",r.ts?new Date(r.ts).toLocaleString("zh-TW",{hour12:false}):"",(r.detail||"").split(", ").join("|")]);
+  const S={};let used=false;rows.forEach(r=>{if(Array.isArray(r.answers)&&r.answers.length){used=true;r.answers.forEach(x=>{const k=x.grp+":"+x.q;const o=S[k]||(S[k]={w:0,t:0});o.t++;if(!x.ok)o.w++})}});
+  if(!used){try{Object.assign(S,JSON.parse(localStorage.getItem("questionErrorStats")||"{}"))}catch(e){}}
+  const full=(g,label)=>{const l=Object.entries(S).filter(([k,o])=>k.split(":")[0]==g&&o.t>0&&BANK[g][k.split(":")[1]-1]).sort((a,b)=>b[1].w-a[1].w||(b[1].w/b[1].t-a[1].w/a[1].t)||(a[0].split(":")[1]-b[0].split(":")[1]));return "【"+label+"類別】全題庫錯題完整排行榜 (按錯誤次數降序)："+(l.length?l.map(([k,o],i)=>"第 "+(i+1)+" 名: 第 "+k.split(":")[1]+" 題(答錯 "+o.w+" 次)").join(", "):"目前數據統計中...")};
+  const tail=[[],[full(1,"醫事人員")],[full(2,"醫院工作人員")]];
+  const data="\uFEFF"+[H,...L,...tail].map(a=>a.map(esc).join(",")).join("\r\n");
+  try{await dl.save({filename:"antibiotic_quiz_"+new Date().toISOString().slice(0,10)+".csv",data})}catch(e){}
+}
+render(local);
+document.querySelectorAll(".walker").forEach(w=>{const d=18+Math.random()*24;w.style.setProperty("--d",d.toFixed(1)+"s");w.style.setProperty("--o","-"+(Math.random()*2*d).toFixed(1)+"s");w.style.setProperty("--h",(0.4+Math.random()*0.35).toFixed(2)+"s");w.style.bottom=(1+Math.random()*6).toFixed(1)+"vh";w.style.width=(40+Math.random()*10).toFixed(0)+"px"});
+(async()=>{try{db=await claude.use("db")}catch(e){db=null}try{dl=await claude.use("downloads");const u=await claude.use("user");adm=!!(u&&((await u.isOwner())||(await u.canEdit())))}catch(e){}if(dl&&adm){$("csv").hidden=false;$("csv").onclick=exportCsv}refresh()})();
+</script></body></html>
